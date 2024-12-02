@@ -1,0 +1,12 @@
+# node
+/node_modules
+/pnpm-lock.yaml
+/yarn.lock
+/package-lock.json
+
+# next.js
+/dist
+/.next
+
+# macos
+.DS_Store
