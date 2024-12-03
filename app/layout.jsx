@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
                     colorMode={colorMode}
                     dayScheme={dayScheme}
                     nightScheme={nightScheme}
+                    preventSSRMismatch
                 >
                     <BaseStyles>
                         {children}
