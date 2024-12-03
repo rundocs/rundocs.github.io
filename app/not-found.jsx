@@ -1,7 +1,7 @@
-export default function Page() {
+export default function NotFound() {
     return (
         <div className="markdown-body">
-            <h1>Page</h1>
+            <h1>NotFound</h1>
         </div>
     );
 }
