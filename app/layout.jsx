@@ -1,4 +1,3 @@
-import { ThemeProvider, BaseStyles } from "@primer/react";
 import "./primer.scss";
 
 export const metadata = {
@@ -7,27 +6,14 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }) {
-    const colorMode = "auto";
-    const dayScheme = "light";
-    const nightScheme = "dark_dimmed";
     return (
         <html
-            data-color-mode={colorMode}
-            data-light-theme={dayScheme}
-            data-dark-theme={nightScheme}
-            suppressHydrationWarning
+            data-color-mode="auto"
+            data-light-theme="light"
+            data-dark-theme="dark_dimmed"
         >
             <body>
-                <ThemeProvider
-                    colorMode={colorMode}
-                    dayScheme={dayScheme}
-                    nightScheme={nightScheme}
-                    preventSSRMismatch
-                >
-                    <BaseStyles>
-                        {children}
-                    </BaseStyles>
-                </ThemeProvider>
+                {children}
             </body>
         </html>
     );
