@@ -4,9 +4,8 @@
 /yarn.lock
 /package-lock.json
 
-# next.js
+# build
 /dist
-/.next
 
 # macos
 .DS_Store
