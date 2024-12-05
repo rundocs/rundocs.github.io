@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@primer/css": "^21.5.1",
-    "@primer/view-components": "^0.35.2",
+    "@primer/view-components": "^0.36.0",
     "marked": "^15.0.3"
   },
   "devDependencies": {
