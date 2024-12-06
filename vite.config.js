@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { handleNotFound, getHtmlEntries } from "./vite.config.plugins.js";
+import { handleNotFound, getHtmlEntries, setManifest } from "./vite.config.plugins.js";
 
 export default defineConfig({
     appType: "mpa",
@@ -11,6 +11,7 @@ export default defineConfig({
     },
     plugins: [
         react(),
+        setManifest(),
         handleNotFound(),
     ],
     css: {

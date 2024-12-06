@@ -38,7 +38,7 @@ function afterMiddlewares(server) {
 }
 export function handleNotFound() {
     return {
-        name: "not-found",
+        name: "handle-not-found",
         configureServer(server) {
             return () => afterMiddlewares(server);
         },
@@ -52,33 +52,61 @@ function sha(string) {
     hash.update(string);
     return hash.digest("hex").slice(0, 8);
 }
-function findHtmlFiles(dirPath) {
-    let excludeDirs = [
-        ".git",
-        "dist",
-        "node_modules",
-    ];
-    let htmlFiles = [];
-
+function findFilesSync(dirPath, ignoreDirs = [], endsWith) {
+    let files = [];
     fs.readdirSync(dirPath)
-        .filter(item => !excludeDirs.includes(item))
-        .forEach(item => {
-            let itemPath = path.join(dirPath, item);
+        .filter(item => !ignoreDirs.includes(item))
+        .map(item => path.join(dirPath, item))
+        .forEach(itemPath => {
             if (fs.statSync(itemPath).isDirectory()) {
-                htmlFiles.push(...findHtmlFiles(itemPath));
+                files.push(...findFilesSync(itemPath, ignoreDirs, endsWith));
             } else {
-                if (item.endsWith(".html")) {
-                    htmlFiles.push(itemPath);
+                if (endsWith) {
+                    if (itemPath.endsWith(endsWith)) {
+                        files.push(itemPath);
+                    }
+                } else {
+                    files.push(itemPath);
                 }
             }
         });
-    return htmlFiles;
+    return files;
 }
 export function getHtmlEntries() {
-    let htmlFiles = findHtmlFiles(process.cwd());
+    let ignoreDirs = [
+        ".git",
+        "dist",
+        "node_modules"
+    ];
+    let htmlFiles = findFilesSync(process.cwd(), ignoreDirs, ".html");
     let entries = {};
     htmlFiles.map(itemPath => {
         entries["app-" + sha(itemPath)] = itemPath;
     });
     return entries;
+}
+
+export function setManifest() {
+    return {
+        name: "set-manifest",
+        writeBundle: {
+            async handler({ dir }) {
+                try {
+                    let distList = findFilesSync(dir).map(itemPath => {
+                        return "/" + path.relative(dir, itemPath);
+                    });
+                    let sw = path.join(dir, "site.sw.js");
+                    let swContent = fs.readFileSync(sw, "utf8");
+
+                    swContent = swContent.replace("MANIFEST", JSON.stringify({
+                        version: Date.now(),
+                        content: distList,
+                    }));
+                    fs.writeFileSync(sw, swContent);
+                } catch (error) {
+                    console.error("set-manifest:", error.message);
+                }
+            }
+        },
+    }
 }
