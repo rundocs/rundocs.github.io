@@ -1,14 +1,16 @@
 import { defineConfig } from "vite";
-import { handleNotFound, getEntries } from "./vite.config.plugins.js";
+import react from "@vitejs/plugin-react";
+import { handleNotFound, getHtmlEntries } from "./vite.config.plugins.js";
 
 export default defineConfig({
+    appType: "mpa",
     build: {
         rollupOptions: {
-            input: getEntries(),
+            input: getHtmlEntries(),
         },
     },
-    appType: "mpa",
     plugins: [
+        react(),
         handleNotFound(),
     ],
     css: {
@@ -21,4 +23,4 @@ export default defineConfig({
             },
         },
     },
-})
+});

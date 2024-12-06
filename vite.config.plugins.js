@@ -2,46 +2,59 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 
-function notFound(server) {
+function afterMiddlewares(server) {
     server.middlewares.use((req, res, next) => {
         let { root, isProduction, build } = server.config;
         if (isProduction) {
             root = path.join(root, build.outDir);
         }
-        let file = path.join(root, req.url.slice(1));
-        let back = path.join(root, "404.html");
+        let file = path.join(root, req.url);
+        let back = path.join(root, "/404.html");
 
         if (fs.existsSync(file)) {
             next();
         } else {
-            res.statusCode = 404;
-            fs.readFile(back, "utf8", (error, data) => {
-                if (error) {
-                    res.end(error.message);
+            if (fs.existsSync(back)) {
+                if (isProduction) {
+                    try {
+                        let data = fs.readFileSync(back, "utf8");
+                        res.statusCode = 404;
+                        res.setHeader("Content-Type", "text/html");
+                        res.end(data);
+                    } catch (error) {
+                        res.statusCode = 500;
+                        res.end(error.message);
+                    }
                 } else {
-                    res.setHeader("Content-Type", "text/html");
-                    res.end(data);
+                    req.url = "/404.html";
+                    next();
                 }
-            });
+            } else {
+                res.statusCode = 404;
+                res.end("404");
+            }
         }
-    })
+    });
 }
 export function handleNotFound() {
     return {
         name: "not-found",
         configureServer(server) {
-            return () => notFound(server);
+            return () => afterMiddlewares(server);
         },
         configurePreviewServer(server) {
-            return () => notFound(server);
-        },
+            return () => afterMiddlewares(server);
+        }
     }
 }
-function hash(input) {
-    return crypto.createHash("sha256").update(input).digest("hex").slice(0, 8);
+function sha(string) {
+    let hash = crypto.createHash("sha256");
+    hash.update(string);
+    return hash.digest("hex").slice(0, 8);
 }
 function findHtmlFiles(dirPath) {
     let excludeDirs = [
+        ".git",
         "dist",
         "node_modules",
     ];
@@ -61,11 +74,11 @@ function findHtmlFiles(dirPath) {
         });
     return htmlFiles;
 }
-export function getEntries() {
+export function getHtmlEntries() {
     let htmlFiles = findHtmlFiles(process.cwd());
-    let hashMap = {};
+    let entries = {};
     htmlFiles.map(itemPath => {
-        hashMap["app-" + hash(itemPath)] = itemPath;
+        entries["app-" + sha(itemPath)] = itemPath;
     });
-    return hashMap;
+    return entries;
 }
