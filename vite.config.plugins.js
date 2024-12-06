@@ -100,7 +100,7 @@ export function setManifest() {
 
                     swContent = swContent.replace("MANIFEST", JSON.stringify({
                         version: Date.now(),
-                        content: ["/", ...distList].toSorted(),
+                        content: ["/", ...distList].sort(),
                     }));
                     fs.writeFileSync(sw, swContent);
                 } catch (error) {
