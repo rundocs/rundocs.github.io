@@ -95,12 +95,12 @@ export function setManifest() {
                     let distList = findFilesSync(dir).map(itemPath => {
                         return "/" + path.relative(dir, itemPath);
                     });
-                    let sw = path.join(dir, "site.sw.js");
+                    let sw = path.join(dir, "server.js");
                     let swContent = fs.readFileSync(sw, "utf8");
 
                     swContent = swContent.replace("MANIFEST", JSON.stringify({
                         version: Date.now(),
-                        content: distList,
+                        content: ["/", ...distList].toSorted(),
                     }));
                     fs.writeFileSync(sw, swContent);
                 } catch (error) {

@@ -3,7 +3,7 @@ document.documentElement.lang = navigator.language;
 async function registerServiceWorker() {
     if ("serviceWorker" in navigator) {
         try {
-            let registration = await navigator.serviceWorker.register("/site.sw.js", {
+            let registration = await navigator.serviceWorker.register("/server.js", {
                 scope: "/",
             });
             if (registration.installing) {
