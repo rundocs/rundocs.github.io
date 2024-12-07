@@ -1,18 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { handleNotFound, getHtmlEntries, setManifest } from "./vite.config.plugins.js";
+import { htmlEntries, mpaNotFound, setManifest } from "./vite.config.plugins.js";
 
 export default defineConfig({
     appType: "mpa",
     build: {
         rollupOptions: {
-            input: getHtmlEntries(),
+            input: htmlEntries({
+                ignoreDirs: [
+                    "dist",
+                    "node_modules"
+                ],
+                dirPath: process.cwd(),
+            }),
         },
     },
     plugins: [
         react(),
-        setManifest(),
-        handleNotFound(),
+        mpaNotFound(),
+        setManifest("sw.js"),
     ],
     css: {
         preprocessorOptions: {
