@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import { execSync } from "child_process";
 
 function findFilesSync(dirPath, ignoreDirs = [], endsWith) {
     let files = [];
@@ -31,6 +32,10 @@ function appID(string) {
     let hash = crypto.createHash("sha256");
     hash.update(String(string));
     return "app-" + hash.digest("hex").slice(0, 8);
+}
+function gitRevision() {
+    let command = "git rev-parse --short=7 HEAD";
+    return execSync(command).toString().trim();
 }
 function afterMiddlewaresNotFound(server) {
     server.middlewares.use((req, res, next) => {
@@ -102,7 +107,7 @@ export function setManifest(filePath) {
                         file: path.join(dir, filePath),
                         searchValue: "__MANIFEST__",
                         replaceValue: JSON.stringify({
-                            version: appID(Date.now()),
+                            revision: gitRevision(),
                             resources: resources.sort(),
                         }),
                     });
