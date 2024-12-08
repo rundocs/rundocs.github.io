@@ -68,6 +68,8 @@ async function sameOriginCacheFirst(request) {
             if (cached.ok) {
                 logger("debug", revision, cached.url);
                 return cached;
+            } else {
+                logger("warn", "cached not ok", cached.url);
             }
         }
     }
