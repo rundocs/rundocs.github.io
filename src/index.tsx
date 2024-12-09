@@ -3,8 +3,6 @@ import Markdown from "./components/Markdown.jsx";
 
 createApp(
     <>
-        index
         <Markdown />
-
     </>
 );
