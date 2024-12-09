@@ -1,12 +1,5 @@
 {
   "type": "module",
-  "scripts": {
-    "build": "vite build",
-    "test": "vitest --run",
-    "dev": "vite",
-    "lint": "eslint src --fix",
-    "preview": "vite preview"
-  },
   "dependencies": {
     "@primer/css": "^21.5.1",
     "@primer/react": "^37.6.0",
