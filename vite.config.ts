@@ -13,6 +13,28 @@ export default defineConfig({
                 ],
                 dirPath: process.cwd(),
             }),
+            output: {
+                manualChunks: {
+                    react: [
+                        "react",
+                        "react-dom"
+                    ],
+                    unified: [
+                        "unified",
+                        "rehype-highlight",
+                        "rehype-raw",
+                        "rehype-slug",
+                        "rehype-stringify",
+                    ],
+                    remark: [
+                        "remark-gemoji",
+                        "remark-gfm",
+                        "remark-parse",
+                        "remark-rehype",
+                        "remark-remove-comments",
+                    ]
+                }
+            }
         },
     },
     plugins: [

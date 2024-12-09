@@ -1,8 +1,10 @@
 import { createApp } from "./theme.js";
-import Markdown from "./components/Markdown.jsx";
+import Markdown from "./components/Markdown.js";
 
 createApp(
     <>
-        <Markdown />
+        <Markdown>
+            # index
+        </Markdown>
     </>
 );
