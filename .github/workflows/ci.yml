@@ -1,4 +1,4 @@
-name: Pages
+name: CI
 
 on:
   push:

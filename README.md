@@ -1,3 +1,3 @@
 # rundocs.github.io
 
-<img src="https://img.shields.io/badge/status-developing-orange">
+![CI](https://github.com/rundocs/rundocs.github.io/actions/workflows/ci.yml/badge.svg)
