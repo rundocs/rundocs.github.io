@@ -5,13 +5,13 @@ type ParsedPath = {
 };
 
 export function parsePath(pathname: string): ParsedPath {
-    let pattern = /^\/(?<user>[^\/]+)?\/?(?<repo>[^\/]+)?\/?(?<path>.+)?$/;
+    const pattern = /^\/(?<user>[^/]+)?\/?(?<repo>[^/]+)?\/?(?<path>.+)?$/;
     let parsed: ParsedPath = {
         user: undefined,
         repo: undefined,
         path: undefined,
     };
-    let match = pathname.match(pattern);
+    const match = pathname.match(pattern);
     if (match && match.groups) {
         parsed = {
             user: match.groups.user,
@@ -22,5 +22,12 @@ export function parsePath(pathname: string): ParsedPath {
     return parsed;
 }
 
-let params = new URLSearchParams(location.search);
-let { user, repo, path } = parsePath(location.pathname);
+function parseParams(): URLSearchParams {
+    if (typeof window !== "undefined") {
+        return new URLSearchParams(window.location.search);
+    } else {
+        return new URLSearchParams();
+    }
+}
+
+export const params = parseParams();

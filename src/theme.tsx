@@ -7,7 +7,7 @@ import logger from "./ts/logger.ts";
 import swRegister from "./ts/swRegister.ts";
 
 export function createApp(children: React.JSX.Element) {
-    let container = document.querySelector("main");
+    const container = document.querySelector("main");
     if (container) {
         createRoot(container).render(
             <StrictMode>

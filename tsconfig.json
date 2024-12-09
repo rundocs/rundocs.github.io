@@ -8,6 +8,7 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "jsx": "react-jsx",
     "skipLibCheck": true,
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -23,6 +24,11 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
   ]
 }
