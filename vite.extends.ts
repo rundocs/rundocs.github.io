@@ -1,10 +1,11 @@
+import type { Plugin, ViteDevServer, PreviewServer } from "vite";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { execSync } from "child_process";
 
-function findFilesSync(dirPath, ignoreDirs = [], endsWith) {
-    let files = [];
+function findFilesSync(dirPath: string, ignoreDirs: string[] = [], endsWith?: string) {
+    let files: string[] = [];
     fs.readdirSync(dirPath)
         .filter(item => !ignoreDirs.includes(item))
         .map(item => path.join(dirPath, item))
@@ -28,22 +29,22 @@ function replaceContentSync({ file, searchValue, replaceValue }) {
     content = content.replace(searchValue, replaceValue);
     fs.writeFileSync(file, content);
 }
-function appID(string) {
+function appID(data: string) {
     let hash = crypto.createHash("sha256");
-    hash.update(String(string));
+    hash.update(data);
     return "app-" + hash.digest("hex").slice(0, 8);
 }
 function gitRevision() {
     let command = "git rev-parse --short=7 HEAD";
     return execSync(command).toString().trim();
 }
-function afterMiddlewaresNotFound(server) {
+function afterMiddlewaresNotFound(server: ViteDevServer | PreviewServer) {
     server.middlewares.use((req, res, next) => {
         let { root, isProduction, build } = server.config;
         if (isProduction) {
             root = path.join(root, build.outDir);
         }
-        let file = path.join(root, req.url);
+        let file = path.join(root, req.url || "/");
         let back = path.join(root, "/404.html");
 
         if (fs.existsSync(file)) {
@@ -82,29 +83,31 @@ export function htmlEntries({ dirPath, ignoreDirs }) {
     });
     return entries;
 }
-export function mpaNotFound() {
+export function mpaNotFound(): Plugin {
     return {
         name: "mpa-not-found",
-        configureServer(server) {
+        configureServer(server: ViteDevServer) {
             return () => afterMiddlewaresNotFound(server);
         },
-        configurePreviewServer(server) {
+        configurePreviewServer(server: PreviewServer) {
             return () => afterMiddlewaresNotFound(server);
         }
     }
 }
-export function setManifest(filePath) {
+export function setManifest(filePath: string): Plugin {
     return {
         name: "set-manifest",
         writeBundle: {
-            async handler({ dir }) {
+            async handler(context) {
                 try {
-                    let resources = findFilesSync(dir)
-                        .map(file => "/" + path.relative(dir, file))
+                    let dist: string = context.dir || process.cwd();
+
+                    let resources = findFilesSync(dist)
+                        .map(file => "/" + path.relative(dist, file))
                         .concat("/");
 
                     replaceContentSync({
-                        file: path.join(dir, filePath),
+                        file: path.join(dist, filePath),
                         searchValue: "__MANIFEST__",
                         replaceValue: JSON.stringify({
                             revision: gitRevision(),

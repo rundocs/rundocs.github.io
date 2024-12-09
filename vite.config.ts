@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { htmlEntries, mpaNotFound, setManifest } from "./vite.config.plugins.js";
+import { htmlEntries, mpaNotFound, setManifest } from "./vite.extends.ts";
 
 export default defineConfig({
     appType: "mpa",
