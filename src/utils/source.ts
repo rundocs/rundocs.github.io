@@ -22,12 +22,4 @@ export function parsePath(pathname: string): ParsedPath {
     return parsed;
 }
 
-function parseParams(): URLSearchParams {
-    if (typeof window !== "undefined") {
-        return new URLSearchParams(window.location.search);
-    } else {
-        return new URLSearchParams();
-    }
-}
-
-export const params = parseParams();
+export const params: URLSearchParams = new URLSearchParams(window.location.search);
