@@ -22,17 +22,17 @@ lint:
 	@pnpm eslint src --fix
 
 .PHONY: build
-build:
+build: lint
 	@$(logger)
 	@pnpm vite $@
 	@pnpm licenses list --prod > dist/licenses.txt
 
-.PHONY: debug
-debug:
+.PHONY: dev
+dev:
 	@$(logger)
 	@pnpm vite
 
 .PHONY: preview
-preview:
+preview: build
 	@$(logger)
 	@pnpm vite $@
