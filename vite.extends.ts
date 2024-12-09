@@ -24,10 +24,15 @@ function findFilesSync(dirPath: string, ignoreDirs: string[] = [], endsWith?: st
         });
     return files;
 }
-function replaceContentSync({ file, searchValue, replaceValue }) {
-    let content = fs.readFileSync(file, "utf8");
+type ReplaceContentOptions = {
+    path: fs.PathLike;
+    searchValue: string;
+    replaceValue: string;
+};
+function replaceContentSync({ path, searchValue, replaceValue }: ReplaceContentOptions) {
+    let content = fs.readFileSync(path, "utf8");
     content = content.replace(searchValue, replaceValue);
-    fs.writeFileSync(file, content);
+    fs.writeFileSync(path, content);
 }
 function appID(data: string) {
     let hash = crypto.createHash("sha256");
@@ -52,15 +57,10 @@ function afterMiddlewaresNotFound(server: ViteDevServer | PreviewServer) {
         } else {
             if (fs.existsSync(back)) {
                 if (isProduction) {
-                    try {
-                        let data = fs.readFileSync(back, "utf8");
-                        res.statusCode = 404;
-                        res.setHeader("Content-Type", "text/html");
-                        res.end(data);
-                    } catch (error) {
-                        res.statusCode = 500;
-                        res.end(error.message);
-                    }
+                    let data = fs.readFileSync(back, "utf8");
+                    res.statusCode = 404;
+                    res.setHeader("Content-Type", "text/html");
+                    res.end(data);
                 } else {
                     req.url = "/404.html";
                     next();
@@ -75,8 +75,12 @@ function afterMiddlewaresNotFound(server: ViteDevServer | PreviewServer) {
 
 // start export
 
-export function htmlEntries({ dirPath, ignoreDirs }) {
-    let entries = {};
+type htmlEntriesOptions = {
+    dirPath: string;
+    ignoreDirs?: string[];
+}
+export function htmlEntries({ dirPath, ignoreDirs }: htmlEntriesOptions) {
+    let entries: { [key: string]: string } = {};
     let files = findFilesSync(dirPath, ignoreDirs, ".html");
     files.forEach(itemPath => {
         entries[appID(itemPath)] = itemPath;
@@ -99,24 +103,20 @@ export function setManifest(filePath: string): Plugin {
         name: "set-manifest",
         writeBundle: {
             async handler(context) {
-                try {
-                    let dist: string = context.dir || process.cwd();
+                let dist: string = context.dir || process.cwd();
 
-                    let resources = findFilesSync(dist)
-                        .map(file => "/" + path.relative(dist, file))
-                        .concat("/");
+                let resources = findFilesSync(dist)
+                    .map(file => "/" + path.relative(dist, file))
+                    .concat("/");
 
-                    replaceContentSync({
-                        file: path.join(dist, filePath),
-                        searchValue: "__MANIFEST__",
-                        replaceValue: JSON.stringify({
-                            revision: gitRevision(),
-                            resources: resources.sort(),
-                        }),
-                    });
-                } catch (error) {
-                    console.error("set-manifest-plugin:", error.message);
-                }
+                replaceContentSync({
+                    path: path.join(dist, filePath),
+                    searchValue: "__MANIFEST__",
+                    replaceValue: JSON.stringify({
+                        revision: gitRevision(),
+                        resources: resources.sort(),
+                    })
+                });
             }
         },
     }
