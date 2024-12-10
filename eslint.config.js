@@ -3,11 +3,16 @@ import js from "@eslint/js";
 import ts from "typescript-eslint";
 import react from "eslint-plugin-react";
 
-
 /** @type {import("eslint").Linter.Config[]} */
 export default [
-    { files: ["**/*.{js,ts,tsx}"] },
-    { languageOptions: { globals: globals.browser } },
+    {
+        languageOptions: {
+            globals: globals.browser,
+        },
+        files: [
+            "**/*.{js,ts,tsx}",
+        ],
+    },
     js.configs.recommended,
     ...ts.configs.recommended,
     {

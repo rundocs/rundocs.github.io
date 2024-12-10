@@ -14,7 +14,7 @@ install:
 .PHONY: test
 test:
 	@$(logger)
-	@pnpm vitest --run
+	@pnpm vitest
 
 .PHONY: lint
 lint:
