@@ -5,7 +5,7 @@ import crypto from "crypto";
 import { execSync } from "child_process";
 
 function findFilesSync(dirPath: string, ignoreDirs: string[] = [], endsWith?: string) {
-    let files: string[] = [];
+    const files: string[] = [];
     fs.readdirSync(dirPath)
         .filter(item => !ignoreDirs.includes(item))
         .map(item => path.join(dirPath, item))
@@ -35,29 +35,30 @@ function replaceContentSync({ path, searchValue, replaceValue }: ReplaceContentO
     fs.writeFileSync(path, content);
 }
 function appID(data: string) {
-    let hash = crypto.createHash("sha256");
+    const hash = crypto.createHash("sha256");
     hash.update(data);
     return "app-" + hash.digest("hex").slice(0, 8);
 }
 function gitRevision() {
-    let command = "git rev-parse --short=7 HEAD";
+    const command = "git rev-parse --short=7 HEAD";
     return execSync(command).toString().trim();
 }
 function afterMiddlewaresNotFound(server: ViteDevServer | PreviewServer) {
     server.middlewares.use((req, res, next) => {
-        let { root, isProduction, build } = server.config;
+        const { root, isProduction, build } = server.config;
+        let serverRoot = root;
         if (isProduction) {
-            root = path.join(root, build.outDir);
+            serverRoot = path.join(serverRoot, build.outDir);
         }
-        let file = path.join(root, req.url || "/");
-        let back = path.join(root, "/404.html");
+        const file = path.join(serverRoot, req.url || "/");
+        const back = path.join(serverRoot, "/404.html");
 
         if (fs.existsSync(file)) {
             next();
         } else {
             if (fs.existsSync(back)) {
                 if (isProduction) {
-                    let data = fs.readFileSync(back, "utf8");
+                    const data = fs.readFileSync(back, "utf8");
                     res.statusCode = 404;
                     res.setHeader("Content-Type", "text/html");
                     res.end(data);
@@ -80,8 +81,8 @@ type htmlEntriesOptions = {
     ignoreDirs?: string[];
 }
 export function htmlEntries({ dirPath, ignoreDirs }: htmlEntriesOptions) {
-    let entries: { [key: string]: string } = {};
-    let files = findFilesSync(dirPath, ignoreDirs, ".html");
+    const entries: { [key: string]: string } = {};
+    const files = findFilesSync(dirPath, ignoreDirs, ".html");
     files.forEach(itemPath => {
         entries[appID(itemPath)] = itemPath;
     });
@@ -103,9 +104,9 @@ export function setManifest(filePath: string): Plugin {
         name: "set-manifest",
         writeBundle: {
             async handler(context) {
-                let dist: string = context.dir || process.cwd();
+                const dist: string = context.dir || process.cwd();
 
-                let resources = findFilesSync(dist)
+                const resources = findFilesSync(dist)
                     .map(file => "/" + path.relative(dist, file))
                     .concat("/");
 

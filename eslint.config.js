@@ -6,6 +6,12 @@ import react from "eslint-plugin-react";
 /** @type {import("eslint").Linter.Config[]} */
 export default [
     {
+        ignores: [
+            "**/dist/",
+            "**/node_modules/",
+        ],
+    },
+    {
         languageOptions: {
             globals: globals.browser,
         },

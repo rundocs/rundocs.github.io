@@ -85,7 +85,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", event => {
     logger("debug", "Activate");
     event.waitUntil(Promise.all([
-        clients.claim(),
+        self.clients.claim(),
         deleteHistoryCaches(),
     ]));
 });

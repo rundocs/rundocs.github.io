@@ -19,7 +19,7 @@ test:
 .PHONY: lint
 lint:
 	@$(logger)
-	@pnpm eslint src/ --fix
+	@pnpm eslint --fix
 
 .PHONY: build
 build: lint
