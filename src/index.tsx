@@ -1,10 +1,8 @@
-import { createApp } from "./theme.js";
-import Markdown from "./components/Markdown.js";
+import { createApp } from "./theme.tsx";
+import Content from "./components/Content.tsx";
 
 createApp(
     <>
-        <Markdown>
-            # index
-        </Markdown>
+        <Content />
     </>
 );
