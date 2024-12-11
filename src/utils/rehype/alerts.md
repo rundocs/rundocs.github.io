@@ -7,9 +7,9 @@ function matcher(node: any) {
 }
 function visitor(node: any) {
     const pattern = /^\[\!(?<alertType>NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\n(?<alertContent>.+)$/ms;
-    let [p] = node.children.filter((child: any) => child.type === "element")
-    let [text] = p.children;
-    let match = text.value.match(pattern);
+    const [p] = node.children.filter((child: any) => child.type === "element")
+    const [text] = p.children;
+    const match = text.value.match(pattern);
     if (match) {
         const { alertType, alertContent } = match.groups;
 

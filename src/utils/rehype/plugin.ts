@@ -21,7 +21,7 @@ export function octicon(name: string, size: number = 16) {
 export function plugin(matcher: any, visitor: any) {
     return () => {
         return async (tree: any) => {
-            const tasks: Promise<void>[] = [];
+            const tasks: any[] = [];
             visitParents(tree, matcher, (node: any, ancestors: any) => {
                 tasks.push(visitor(node, ancestors));
             });
