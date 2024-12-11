@@ -11,6 +11,8 @@ import remarkRemoveHtmlComments from "remark-remove-comments";
 
 import request from "./request.ts";
 import rehypeMermaid from "./rehype/mermaid.ts";
+// import rehypeAlerts from "./rehype/alerts.ts";
+import rehypeHeading from "./rehype/heading.ts";
 function createProcessor() {
     return unified()
         // Parse Markdown to AST
@@ -30,6 +32,8 @@ function createProcessor() {
         .use(rehypeHighlight)
         .use(rehypeSlug)
         .use(rehypeMermaid)
+        // .use(rehypeAlerts)
+        .use(rehypeHeading)
 
         // Serialize HAST to HTML
         .use(rehypeStringify)

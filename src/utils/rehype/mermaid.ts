@@ -1,6 +1,6 @@
+import { plugin, h } from "./plugin.ts";
 import mermaid from "mermaid";
-import { visit } from "unist-util-visit";
-import svgToMiniDataURI from "mini-svg-data-uri";
+import svgDataURI from "mini-svg-data-uri";
 
 async function getMermaidData(text: string, theme: "default" | "dark") {
     mermaid.initialize({
@@ -17,70 +17,49 @@ async function getMermaidData(text: string, theme: "default" | "dark") {
     const { height, width } = element.viewBox.baseVal;
 
     return {
-        dataURI: svgToMiniDataURI.toSrcset(svg),
-        height,
+        dataURI: svgDataURI.toSrcset(svg),
         width,
+        height,
         description: element.getAttribute("aria-roledescription"),
     }
 }
-
-async function getPicture(text: string) {
-    const light = await getMermaidData(text, "default");
-    const dark = await getMermaidData(text, "dark");
-
-    return {
-        type: "element",
-        tagName: "picture",
-        children: [{
-            type: "element",
-            tagName: "source",
-            properties: {
-                media: "(prefers-color-scheme: dark)",
-                type: "image/svg+xml",
-                srcset: dark.dataURI,
-            },
-        }, {
-            type: "element",
-            tagName: "img",
-            properties: {
-                height: light.height,
-                width: light.width,
-                title: text,
-                alt: light.description,
-                src: light.dataURI,
-            },
-        }]
-    }
+function matcher(node: any) {
+    return node.type === "element"
+        && node.tagName === "code"
+        && node.properties.className.includes("language-mermaid")
 }
-async function handleMermaid(node: any, parent: any) {
+async function visitor(node: any, ancestors: any) {
     try {
-        const picture = await getPicture(node.children[0].value)
-        parent.tagName = "div";
-        parent.properties = {
+        const [code] = node.children;
+        const div = ancestors.at(-1);
+        const dark = await getMermaidData(code.value, "dark");
+        const light = await getMermaidData(code.value, "default");
+        div.tagName = "div";
+        div.properties = {
             className: [
                 "mermaid",
                 "p-3",
             ],
         };
-        parent.children = [picture];
+        div.children = [
+            h("picture", [
+                h("source", {
+                    media: "(prefers-color-scheme: dark)",
+                    type: "image/svg+xml",
+                    srcset: dark.dataURI,
+                }),
+                h("img", {
+                    height: light.height,
+                    width: light.width,
+                    title: code.value,
+                    alt: light.description,
+                    src: light.dataURI,
+                })
+            ])
+        ];
     } catch (error) {
         console.error("Error rendering Mermaid diagram:", error);
     }
 }
 
-export default function rehypeMermaid() {
-    return async function (tree: any) {
-        // // 2次?????????
-        // console.log("iiiiiii" + Date.now());
-
-        const promises: Promise<void>[] = [];
-        visit(tree, "element", function (node, _, parent) {
-            if (parent.tagName === "pre" && node.tagName === "code") {
-                if (node.properties.className.includes("language-mermaid")) {
-                    promises.push(handleMermaid(node, parent));
-                }
-            }
-        });
-        await Promise.all(promises);
-    };
-}
+export default plugin(matcher, visitor);
